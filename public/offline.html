@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Travel Journal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+
+        h1 {
+            color: #ff6f61;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>You are Offline</h1>
+    <p>It seems you're not connected to the internet. You can still capture your travel memories by recording voice
+        memos!</p>
+
+    <div id="voiceMemoSection">
+        <h2>📍 Travel Voice Memo</h2>
+        <p>Capture the sounds of your journey even when you're offline.</p>
+
+        <button id="startRecording" onclick="startRecording()">Start Recording</button>
+        <button id="stopRecording" onclick="stopRecording()" disabled>Stop Recording</button>
+        <audio id="audioPlayer" controls style="display:none; margin-top: 20px;"></audio>
+
+        <p id="memoStatus" style="margin-top: 20px;"></p>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioURL;
+
+        // Check if there is a previously recorded memo in localStorage
+        if (localStorage.getItem('offlineMemo')) {
+            document.getElementById('memoStatus').innerText = "You have a saved memo. Play it below!";
+            document.getElementById('audioPlayer').src = localStorage.getItem('offlineMemo');
+            document.getElementById('audioPlayer').style.display = "block";
+        }
+
+        // Start recording
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    audioURL = URL.createObjectURL(audioBlob);
+                    document.getElementById('audioPlayer').src = audioURL;
+                    document.getElementById('audioPlayer').style.display = "block";
+                    localStorage.setItem('offlineMemo', audioURL);
+                    document.getElementById('memoStatus').innerText = "Memo saved!";
+                };
+
+                mediaRecorder.start();
+                document.getElementById('startRecording').disabled = true;
+                document.getElementById('stopRecording').disabled = false;
+            } catch (error) {
+                console.error("Error accessing microphone:", error);
+                alert("Please allow microphone access.");
+            }
+        }
+
+        // Stop recording
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+                document.getElementById('startRecording').disabled = false;
+                document.getElementById('stopRecording').disabled = true;
+            }
+        }
+    </script>
+</body>
+
+</html>
