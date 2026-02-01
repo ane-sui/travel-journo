@@ -1,8 +1,5 @@
-Here’s a **simpler, straight-to-the-point version** of your README for **Travel Journal Pro PWA**:
 
----
-
-# Travel Journal PWA
+# Travel Journal
 
 Travel Journal is an offline-ready web app built with Next.js that lets users save travel memories with photos, voice notes, and location tags.
 
@@ -51,6 +48,3 @@ npm run dev
 * Service worker via `next-pwa`
 * Offline detection with `navigator.onLine`
 
----
-
-If you want, I can also write a **GitHub project description**, **portfolio summary**, or **demo deployment text** for it.
